@@ -15,6 +15,7 @@
 
 
 ## 📋 설치 및 실행 방법
+### packge manage opxr hands 활성화 필요
 
 
 ## 🎮 게임 플레이 가이드
