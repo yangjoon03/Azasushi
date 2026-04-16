@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e9e79209d93d78044afb7eb83ad373c8
+timeCreated: 1537473150
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nMaleRace/Slots/o3n_male_hands_LOD0/o3n_male_hands_LOD0_Slot.asset
+  uploadId: 563683

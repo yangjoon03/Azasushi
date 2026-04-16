@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f7c90c24217c45b498713c7365c90455
+timeCreated: 1508277833
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/Expressions/o3n_female_poses/HeadTiltRight.asset
+  uploadId: 563683

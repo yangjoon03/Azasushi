@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ae29e7b7c6eef8a47adde4f3f57204c4
+timeCreated: 1557587931
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/o3nFemaleDNAConverterController/lowerWeight_0.asset
+  uploadId: 563683

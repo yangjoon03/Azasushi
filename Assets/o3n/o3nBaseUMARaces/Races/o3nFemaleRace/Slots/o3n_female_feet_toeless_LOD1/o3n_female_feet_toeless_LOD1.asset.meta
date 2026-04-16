@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d10bd33796b8ddd47a6d4c9647b5a914
+timeCreated: 1536613280
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 4300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/Slots/o3n_female_feet_toeless_LOD1/o3n_female_feet_toeless_LOD1.asset
+  uploadId: 563683

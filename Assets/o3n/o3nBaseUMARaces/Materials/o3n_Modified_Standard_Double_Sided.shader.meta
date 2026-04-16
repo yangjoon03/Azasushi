@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fb6b34e7e4e66404a813af63cd51482e
+timeCreated: 1514681688
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Materials/o3n_Modified_Standard_Double_Sided.shader
+  uploadId: 563683

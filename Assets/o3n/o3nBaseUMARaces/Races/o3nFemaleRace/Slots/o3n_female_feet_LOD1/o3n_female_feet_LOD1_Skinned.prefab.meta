@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e197564ea487cd5478d7849342e063e7
+timeCreated: 1536613265
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/Slots/o3n_female_feet_LOD1/o3n_female_feet_LOD1_Skinned.prefab
+  uploadId: 563683

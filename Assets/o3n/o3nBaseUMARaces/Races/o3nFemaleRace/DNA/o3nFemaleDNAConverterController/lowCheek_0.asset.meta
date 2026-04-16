@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dd6884ace1e1e7142bd372793c04213f
+timeCreated: 1557587952
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/o3nFemaleDNAConverterController/lowCheek_0.asset
+  uploadId: 563683

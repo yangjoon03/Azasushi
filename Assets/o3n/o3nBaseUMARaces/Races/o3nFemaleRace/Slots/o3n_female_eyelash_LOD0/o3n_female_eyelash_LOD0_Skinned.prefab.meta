@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9551eb1c4eed0fd4a93884b86fcfd9bd
+timeCreated: 1536692396
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/Slots/o3n_female_eyelash_LOD0/o3n_female_eyelash_LOD0_Skinned.prefab
+  uploadId: 563683

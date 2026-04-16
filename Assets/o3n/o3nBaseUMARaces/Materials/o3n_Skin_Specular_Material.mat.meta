@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 93fd855f3e43b0446b1f1b6572ba4a9c
+timeCreated: 1519066520
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Materials/o3n_Skin_Specular_Material.mat
+  uploadId: 563683

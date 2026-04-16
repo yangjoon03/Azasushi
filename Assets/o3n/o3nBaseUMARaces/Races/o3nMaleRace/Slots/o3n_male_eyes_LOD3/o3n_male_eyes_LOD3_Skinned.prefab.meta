@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ef31bbaae931fc541b2550ac12bf00f2
+timeCreated: 1537473032
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nMaleRace/Slots/o3n_male_eyes_LOD3/o3n_male_eyes_LOD3_Skinned.prefab
+  uploadId: 563683

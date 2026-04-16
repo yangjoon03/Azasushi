@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: dbcba4e4d06c36b449365411dd593684
+timeCreated: 1535153642
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/common/TwistScripts/O3nTwistBone.cs
+  uploadId: 563683

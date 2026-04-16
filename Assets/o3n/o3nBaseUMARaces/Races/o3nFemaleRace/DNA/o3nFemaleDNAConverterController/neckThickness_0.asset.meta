@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fabaa2154d3cbc940868b75293344ad7
+timeCreated: 1557587985
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/o3nFemaleDNAConverterController/neckThickness_0.asset
+  uploadId: 563683

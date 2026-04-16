@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 05df0fba5101caf499994f49c87b05ff
+timeCreated: 1557588450
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/o3nFemaleChildDNAConverterController/Morph
+    Set.asset
+  uploadId: 563683

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 45d3ba2a17510bb4ab69e4c9aa58a4ea
+timeCreated: 1536699654
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Content/Clothing/o3n_female_dress_01/o3n_female_dress_01_LOD3/o3n_female_dress_01_LOD3_Slot.asset
+  uploadId: 563683

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0bb0c44ba0648824b93ea2a8d0c0d2b1
+timeCreated: 1536769424
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Content/Hair/o3n_female_longhair_01/o3n_female_longhair_01_LOD0/o3n_female_longhair_01_LOD0_Skinned.prefab
+  uploadId: 563683

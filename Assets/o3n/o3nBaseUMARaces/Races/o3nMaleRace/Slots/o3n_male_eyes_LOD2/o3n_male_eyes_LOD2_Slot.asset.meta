@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5dbcb392e14fad0428e5446661fc7bce
+timeCreated: 1537473022
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nMaleRace/Slots/o3n_male_eyes_LOD2/o3n_male_eyes_LOD2_Slot.asset
+  uploadId: 563683

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fd3666998df006145ad51a2c238c37ea
+timeCreated: 1537475165
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Content/Clothing/o3n_male_hoodie_01/o3n_male_hoodie_01_LOD3/o3n_male_hoodie_01_LOD3_Skinned.prefab
+  uploadId: 563683

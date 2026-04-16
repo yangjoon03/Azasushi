@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 488cbfc023d49f44bab4366e91e50b88
+timeCreated: 1508447033
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 102187
+  packageName: o3n Male and Female UMA Races
+  packageVersion: 1.35
+  assetPath: Assets/o3n/o3nBaseUMARaces/Races/common/Physics/o3nPhysicsStandardSlot.asset
+  uploadId: 563683
