@@ -27,8 +27,8 @@ public class FingerBoneCollider : MonoBehaviour
     // ── 접촉 데이터 구조체 ─────────────────────────────────────────
     public struct BoneContactData
     {
-        public Vector3 contactPoint;      // 월드 좌표 접촉점
-        public Vector3 contactNormal;     // 오브젝트 표면 → 손 방향 법선
+        public Vector3 contactPoint;    // 월드 좌표 접촉점
+        public Vector3 contactNormal;   // 오브젝트 표면 → 손 방향 법선
         public float penetrationDepth;  // 손이 오브젝트 안으로 들어간 깊이
         public float contactTime;       // 접촉 시작 시각
     }
@@ -37,9 +37,8 @@ public class FingerBoneCollider : MonoBehaviour
     private void Awake()
     {
         boneCollider = GetComponent<Collider>();
-        boneCollider.isTrigger = false; // 물리 충돌 유지
+        boneCollider.isTrigger = false;
 
-        // 루트 방향으로 PhysicalHandGrasper 탐색
         handGrasper = GetComponentInParent<PhysicalHandGrasper>();
         if (handGrasper == null)
             Debug.LogWarning($"[FingerBoneCollider] {name}: PhysicalHandGrasper를 찾을 수 없습니다.");
@@ -61,7 +60,7 @@ public class FingerBoneCollider : MonoBehaviour
         if (graspable == null) return;
 
         var data = BuildContactData(collision);
-        activeContacts[graspable] = data; // 매 프레임 갱신
+        activeContacts[graspable] = data;
         handGrasper?.OnBoneContactStay(this, graspable, data);
     }
 
@@ -77,12 +76,11 @@ public class FingerBoneCollider : MonoBehaviour
     // ── 유틸리티 ───────────────────────────────────────────────────
     private BoneContactData BuildContactData(Collision collision)
     {
-        // 여러 접촉점 중 가장 깊은 것 사용
         ContactPoint best = collision.contacts[0];
         float maxDepth = 0f;
         foreach (var cp in collision.contacts)
         {
-            if (cp.separation < maxDepth) // separation은 음수일수록 더 깊이 침투
+            if (cp.separation < maxDepth)
             {
                 maxDepth = cp.separation;
                 best = cp;
@@ -92,7 +90,7 @@ public class FingerBoneCollider : MonoBehaviour
         return new BoneContactData
         {
             contactPoint = best.point,
-            contactNormal = best.normal,      // 오브젝트 → 손 방향
+            contactNormal = best.normal,
             penetrationDepth = Mathf.Abs(best.separation),
             contactTime = Time.time
         };
