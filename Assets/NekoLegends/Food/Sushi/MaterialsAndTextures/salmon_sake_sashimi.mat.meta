@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: db58ea6498fc79f4d98cd7372fd0164a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268787
+  packageName: Food - Sushi
+  packageVersion: 1.3.1
+  assetPath: Assets/NekoLegends/Food/Sushi/MaterialsAndTextures/salmon_sake_sashimi.mat
+  uploadId: 740424

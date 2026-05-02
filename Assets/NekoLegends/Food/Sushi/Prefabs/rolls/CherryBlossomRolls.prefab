@@ -1,0 +1,285 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &376984549256584103
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3988272961018112456}
+  m_Layer: 0
+  m_Name: CherryBlossomRolls
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3988272961018112456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376984549256584103}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7934729803716438745}
+  - {fileID: 7207349582070463170}
+  - {fileID: 7388155500497304618}
+  - {fileID: 927092732435066774}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &464554607350752215
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3988272961018112456}
+    m_Modifications:
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.09395449
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.03936618
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.012634497
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.072231434
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7077607
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70045745
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.056717597
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -1.306
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 190.458
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90.475
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099208165991397189, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_Name
+      value: rollCherryBlossom (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+--- !u!4 &927092732435066774 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+  m_PrefabInstance: {fileID: 464554607350752215}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7255878093497427608
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3988272961018112456}
+    m_Modifications:
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0315
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0407
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0165
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5839117
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.4064348
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.4134431
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5682629
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -0.272
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -70.867
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 88.638
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099208165991397189, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_Name
+      value: rollCherryBlossom
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+--- !u!4 &7934729803716438745 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+  m_PrefabInstance: {fileID: 7255878093497427608}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7793439921631899755
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3988272961018112456}
+    m_Modifications:
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.082603455
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.04252717
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.032401532
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6809147
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.2061495
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.18952605
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.6767108
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 1.389
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 32.498
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099208165991397189, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_Name
+      value: rollCherryBlossom (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+--- !u!4 &7388155500497304618 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+  m_PrefabInstance: {fileID: 7793439921631899755}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7974320624024974979
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3988272961018112456}
+    m_Modifications:
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.01958677
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.040543705
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.021001415
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.35082924
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.6189197
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.60398334
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.35925135
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.018
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 119.717
+      objectReference: {fileID: 0}
+    - target: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 91.389
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099208165991397189, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+      propertyPath: m_Name
+      value: rollCherryBlossom (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+--- !u!4 &7207349582070463170 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 770076063975525441, guid: d90fc86b5ba8d2d4cb05e169a7be837b, type: 3}
+  m_PrefabInstance: {fileID: 7974320624024974979}
+  m_PrefabAsset: {fileID: 0}
