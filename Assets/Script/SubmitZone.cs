@@ -6,33 +6,29 @@ public class SubmitZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        string itemName = DetectItemType(other.gameObject);
+        string submittedItem = other.gameObject.name.ToLower();
 
-        if (itemName == "")
+        // (Clone) 제거
+        submittedItem = submittedItem.Replace("(clone)", "").Trim();
+
+        // 정확히 일치하는 경우만 인정
+        if (IsValidSushi(submittedItem))
         {
-            return;
+            orderManager.CheckSubmittedItem(submittedItem);
         }
-
-        orderManager.CheckSubmittedItem(itemName);
+        else
+        {
+            Debug.Log("Not a completed sushi: " + submittedItem);
+        }
     }
 
-    string DetectItemType(GameObject obj)
+    bool IsValidSushi(string name)
     {
-        if (obj.GetComponent<SphereCollider>() != null)
-        {
-            return "Sphere";
-        }
-
-        if (obj.GetComponent<CapsuleCollider>() != null)
-        {
-            return "Capsule";
-        }
-
-        if (obj.GetComponent<BoxCollider>() != null)
-        {
-            return "Cube";
-        }
-
-        return "";
+        return name == "saba" ||
+               name == "unagi" ||
+               name == "tai" ||
+               name == "salmon" ||
+               name == "shrimp" ||
+               name == "otoro";
     }
 }

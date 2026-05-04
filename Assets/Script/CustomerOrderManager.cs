@@ -17,7 +17,7 @@ public class CustomerOrderManager : MonoBehaviour
 
     public void NewOrder()
     {
-        string[] orders = { "Cube", "Sphere", "Capsule" };
+        string[] orders = { "saba", "unagi", "tai", "salmon", "shrimp", "otoro" };
 
         currentOrder = orders[Random.Range(0, orders.Length)];
 
