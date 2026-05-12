@@ -14,7 +14,7 @@ public class PhysicalHandGrasper : MonoBehaviour
     // ── 인스펙터 설정 ──────────────────────────────────────────────
     [Header("Grasp Thresholds")]
     [Tooltip("파지 확정에 필요한 최소 접촉 뼈대 수")]
-    public int minContactBonesForGrasp = 3;
+    public int minContactBonesForGrasp = 2;
 
     [Tooltip("파지 확정에 필요한 최소 힘 강도 (0~1)")]
     public float minGraspForce = 0.15f;
@@ -30,6 +30,9 @@ public class PhysicalHandGrasper : MonoBehaviour
     [Tooltip("손가락이 오브젝트 크기보다 더 안쪽으로 들어온 비율 기준 (0~1)")]
     public float innerGraspRatio = 0.5f;
 
+    [Tooltip("접촉 중인 뼈대 기준 평균 거리가 objRadius + 이 값 이상이면 파지 해제 (m)")]
+    public float spreadReleaseMargin = 0.05f;
+
     [Header("Hand Root Bone")]
     public Transform wristBone;
 
@@ -41,9 +44,6 @@ public class PhysicalHandGrasper : MonoBehaviour
     // 현재 파지 확정된 오브젝트
     private Dictionary<GraspableObject, GraspState> activeGrasps
         = new Dictionary<GraspableObject, GraspState>();
-
-    // 손 전체의 뼈대 목록 (Awake 시 수집)
-    private List<FingerBoneCollider> allBones = new List<FingerBoneCollider>();
 
     // ── 데이터 구조체 ──────────────────────────────────────────────
     private class ObjectContactState
@@ -58,19 +58,14 @@ public class PhysicalHandGrasper : MonoBehaviour
     public class GraspState
     {
         public GraspableObject target;
-        public Vector3 graspAnchorLocal;      // 파지 시작 시점 오브젝트 로컬 앵커 (손 기준)
+        public Vector3 graspAnchorLocal;       // 파지 시작 시점 오브젝트 로컬 앵커 (손 기준)
         public Quaternion graspRotationOffset; // 파지 시작 시점 회전 오프셋
-        public float graspForce;            // 0~1
-        public bool isGravitySupported;    // 중력 반대 접촉 존재 여부
-        public Vector3 graspCenter;           // 월드 좌표 파지 중심점
+        public float graspForce;               // 0~1
+        public bool isGravitySupported;        // 중력 반대 접촉 존재 여부
+        public Vector3 graspCenter;            // 월드 좌표 파지 중심점
     }
 
     // ── Unity 생명주기 ─────────────────────────────────────────────
-    private void Awake()
-    {
-        allBones.AddRange(GetComponentsInChildren<FingerBoneCollider>());
-    }
-
     private void FixedUpdate()
     {
         // 매 물리 프레임마다 파지 조건 재평가
@@ -92,35 +87,11 @@ public class PhysicalHandGrasper : MonoBehaviour
         EnsureContactState(obj).boneContacts[bone] = data;
     }
 
-    //public void OnBoneContactExit(FingerBoneCollider bone, GraspableObject obj)
-    //{
-    //    if (!contactStates.TryGetValue(obj, out var state)) return;
-    //    state.boneContacts.Remove(bone);
-
-    //    if (state.ContactCount == 0)
-    //    {
-    //        contactStates.Remove(obj);
-    //        TryReleaseGrasp(obj);
-    //    }
-    //}
-    //public void OnBoneContactExit(FingerBoneCollider bone, GraspableObject obj)
-    //{
-    //    // 이미 파지 확정된 오브젝트는 OnCollisionExit 무시
-    //    // (isKinematic 전환 시 Unity가 강제로 Exit 발생시키기 때문)
-    //    if (activeGrasps.ContainsKey(obj)) return;
-
-    //    if (!contactStates.TryGetValue(obj, out var state)) return;
-    //    state.boneContacts.Remove(bone);
-
-    //    if (state.ContactCount == 0)
-    //    {
-    //        contactStates.Remove(obj);
-    //        TryReleaseGrasp(obj);
-    //    }
-    //}
     public void OnBoneContactExit(FingerBoneCollider bone, GraspableObject obj)
     {
-        if (activeGrasps.ContainsKey(obj)) return;  // 유지
+        // 파지 확정 중인 오브젝트는 OnCollisionExit 무시
+        // (isKinematic 전환 시 Unity가 강제로 Exit를 발생시키기 때문)
+        if (activeGrasps.ContainsKey(obj)) return;
 
         if (!contactStates.TryGetValue(obj, out var state)) return;
         state.boneContacts.Remove(bone);
@@ -133,60 +104,12 @@ public class PhysicalHandGrasper : MonoBehaviour
     }
 
     // ── 파지 평가 ──────────────────────────────────────────────────
-    //private void EvaluateAllGrasps()
-    //{
-    //    // 현재 접촉 중인 모든 오브젝트 평가
-    //    foreach (var kvp in contactStates)
-    //    {
-    //        var obj   = kvp.Key;
-    //        var state = kvp.Value;
-    //        EvaluateGraspForObject(obj, state);
-    //    }
-
-    //    // 더 이상 접촉 없는 오브젝트 해제
-    //    var toRelease = activeGrasps.Keys
-    //        .Where(o => !contactStates.ContainsKey(o))
-    //        .ToList();
-    //    foreach (var o in toRelease) TryReleaseGrasp(o);
-    //}
-    // ── 파지 평가 ──────────────────────────────────────────────
-    //private void EvaluateAllGrasps()          // 기존 메서드 전체 교체
-    //{
-    //    foreach (var kvp in contactStates)
-    //        EvaluateGraspForObject(kvp.Key, kvp.Value);
-
-    //    var toRelease = activeGrasps.Keys
-    //        .Where(o => !contactStates.ContainsKey(o) && !IsHandNearObject(o))
-    //        .ToList();
-    //    foreach (var o in toRelease) TryReleaseGrasp(o);
-    //}
-
-
-    //private void EvaluateAllGrasps()
-    //{
-    //    foreach (var kvp in contactStates)
-    //        EvaluateGraspForObject(kvp.Key, kvp.Value);
-
-    //    var toRelease = activeGrasps.Keys
-    //        .Where(o => !contactStates.ContainsKey(o) && !IsHandNearObject(o))
-    //        .ToList();
-
-    //    // 해제 대상 로그
-    //    foreach (var o in activeGrasps.Keys)
-    //    {
-    //        bool inContact = contactStates.ContainsKey(o);
-    //        bool handNear = IsHandNearObject(o);
-    //        Debug.Log($"{o.name} — contactStates에 있음:{inContact}, 손 근처:{handNear}");
-    //    }
-
-    //    foreach (var o in toRelease) TryReleaseGrasp(o);
-    //}
     private void EvaluateAllGrasps()
     {
         foreach (var kvp in contactStates)
             EvaluateGraspForObject(kvp.Key, kvp.Value);
 
-        // 파지 해제: contactStates 없음 OR 손가락이 충분히 펼쳐짐
+        // 파지 해제: contactStates 없음 OR 접촉 뼈대 기준으로 충분히 펼쳐짐
         var toRelease = activeGrasps.Keys
             .Where(o => !contactStates.ContainsKey(o) || IsFingerSpreadEnoughToRelease(o))
             .ToList();
@@ -195,52 +118,35 @@ public class PhysicalHandGrasper : MonoBehaviour
     }
 
     /// <summary>
-    /// 파지 중 손가락들이 오브젝트에서 충분히 멀어지면 true → 파지 해제
+    /// 파지 중 접촉 뼈대들이 오브젝트에서 충분히 멀어지면 true → 파지 해제.
+    /// allBones 전체가 아닌 현재 contactStates에 등록된 뼈대만 기준으로 삼아
+    /// 안 닿은 손가락이 평균을 왜곡하는 문제를 방지한다.
     /// </summary>
-    //private bool IsFingerSpreadEnoughToRelease(GraspableObject obj)
-    //{
-    //    if (!activeGrasps.ContainsKey(obj)) return false;
-
-    //    Vector3 objCenter = obj.transform.position;
-    //    float totalDist = 0f;
-    //    int count = 0;
-    //    foreach (var bone in allBones)
-    //    {
-    //        totalDist += Vector3.Distance(bone.WorldPosition, objCenter);
-    //        count++;
-    //    }
-    //    if (count == 0) return false;
-
-    //    float avgDist = totalDist / count;
-
-    //    // 오브젝트 크기의 1.5배 이상 거리면 손이 펼쳐진 것으로 판단
-    //    float objRadius = obj.GetWorldBounds().extents.magnitude;
-    //    return avgDist > objRadius * 1.5f;
-    //}
-
     private bool IsFingerSpreadEnoughToRelease(GraspableObject obj)
     {
         if (!activeGrasps.ContainsKey(obj)) return false;
 
-        // 오브젝트 Collider 기반 실제 크기 사용
-        // extents.magnitude 대신 가장 긴 축의 절반 값만 사용
+        // contactStates에 없으면 접촉 뼈대가 0개 → 해제
+        if (!contactStates.TryGetValue(obj, out var state)) return true;
+
         Bounds bounds = obj.GetWorldBounds();
         float objRadius = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
 
         Vector3 objCenter = obj.transform.position;
         float totalDist = 0f;
         int count = 0;
-        foreach (var bone in allBones)
+
+        // ★ 핵심 수정: allBones 전체 → 실제 접촉 중인 뼈대만
+        foreach (var bone in state.boneContacts.Keys)
         {
             totalDist += Vector3.Distance(bone.WorldPosition, objCenter);
             count++;
         }
-        if (count == 0) return false;
+
+        if (count == 0) return true;
 
         float avgDist = totalDist / count;
-
-        // 오브젝트 실제 크기 + 5cm 여유만큼 떨어지면 해제
-        return avgDist > objRadius + 0.01f;
+        return avgDist > objRadius + spreadReleaseMargin;
     }
 
     private void EvaluateGraspForObject(GraspableObject obj, ObjectContactState state)
@@ -319,7 +225,7 @@ public class PhysicalHandGrasper : MonoBehaviour
                                                   Bounds bounds)
     {
         Vector3 localPos = obj.transform.InverseTransformPoint(boneWorld);
-        Vector3 halfSize = bounds.extents * innerGraspRatio; // 내부 절반 영역
+        Vector3 halfSize = bounds.extents * innerGraspRatio;
 
         float dx = Mathf.Clamp01(1f - Mathf.Abs(localPos.x) / halfSize.x);
         float dy = Mathf.Clamp01(1f - Mathf.Abs(localPos.y) / halfSize.y);
@@ -335,12 +241,10 @@ public class PhysicalHandGrasper : MonoBehaviour
     /// </summary>
     private bool CheckGravitySupport(ObjectContactState state)
     {
-        Vector3 gravityDir = Physics.gravity.normalized; // 보통 (0,-1,0)
+        Vector3 gravityDir = Physics.gravity.normalized;
 
         foreach (var kvp in state.boneContacts)
         {
-            // contactNormal: 오브젝트 표면 → 손 방향
-            // 중력과 반대(위쪽)인 법선 = 아래에서 받쳐주는 접촉
             float angle = Vector3.Angle(-gravityDir, kvp.Value.contactNormal);
             if (angle < gravitySupportAngleThreshold)
                 return true;
@@ -351,7 +255,7 @@ public class PhysicalHandGrasper : MonoBehaviour
     // ── 파지 방향 유효성 (위에서 누르기 차단) ─────────────────────
     /// <summary>
     /// 모든 접촉 법선이 "중력 방향"(아래쪽)에 가깝다면 위에서만 누르는 상황.
-    /// 이 경우 파지 무효.  반대로 옆면 또는 아래에서의 접촉이 포함되면 유효.
+    /// 이 경우 파지 무효. 반대로 옆면 또는 아래에서의 접촉이 포함되면 유효.
     /// </summary>
     private bool IsGraspDirectionValid(GraspableObject obj, ObjectContactState state)
     {
@@ -361,7 +265,6 @@ public class PhysicalHandGrasper : MonoBehaviour
         foreach (var kvp in state.boneContacts)
         {
             Vector3 normal = kvp.Value.contactNormal;
-            // 법선이 중력과 같은 방향(위→아래) ≈ 위에서 누름
             float angle = Vector3.Angle(gravityDir, normal);
             if (angle < gravitySupportAngleThreshold)
                 topOnlyContacts++;
@@ -383,7 +286,6 @@ public class PhysicalHandGrasper : MonoBehaviour
         graspCenter /= state.ContactCount;
 
         // 파지 앵커: wristBone 기준 로컬 좌표로 저장
-        // (wristBone이 없으면 루트 transform 사용)
         Transform anchor = wristBone != null ? wristBone : transform;
         Vector3 localAnchor = anchor.InverseTransformPoint(obj.transform.position);
         Quaternion rotOffset = Quaternion.Inverse(anchor.rotation) * obj.transform.rotation;
