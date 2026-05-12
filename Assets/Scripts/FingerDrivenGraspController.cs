@@ -1,11 +1,11 @@
 using UnityEngine;
-using UnityEngine.XR.Hands;
+using UnityEngine.XR.Hands; // OpenXR Hand Tracking package
 using System.Collections.Generic;
 
 /// <summary>
 /// OpenXR Hand Tracking 데이터를 읽어
 /// 1) 각 FingerBoneCollider의 위치/회전을 XR 관절 데이터로 업데이트
-/// 2) 손가락 움직임 벡터를 【이 손이 파지 중인】 오브젝트에만 전달  ← 양손 수정
+/// 2) 손가락 움직임 벡터를 파지 중인 오브젝트에 전달
 /// 3) 손가락이 오브젝트로부터 멀어지면 접촉 해제를 강제 처리
 /// </summary>
 public class FingerDrivenGraspController : MonoBehaviour
@@ -37,9 +37,11 @@ public class FingerDrivenGraspController : MonoBehaviour
     private XRHandSubsystem handSubsystem;
     private PhysicalHandGrasper handGrasper;
 
+    // 뼈대별 이전 프레임 위치 (손가락 이동 벡터 계산용)
     private Dictionary<FingerBoneCollider, Vector3> prevBonePositions
         = new Dictionary<FingerBoneCollider, Vector3>();
 
+    // 강제 접촉 해제 타이머
     private float separationTimer = 0f;
 
     // ── Unity 생명주기 ─────────────────────────────────────────────
@@ -49,6 +51,7 @@ public class FingerDrivenGraspController : MonoBehaviour
         if (handGrasper == null)
             handGrasper = GetComponentInParent<PhysicalHandGrasper>();
 
+        // 뼈대 초기 위치 기록
         foreach (var mapping in boneMappings)
             if (mapping.boneCollider != null)
                 prevBonePositions[mapping.boneCollider] = mapping.boneCollider.WorldPosition;
@@ -56,6 +59,7 @@ public class FingerDrivenGraspController : MonoBehaviour
 
     private void OnEnable()
     {
+        // XRHandSubsystem 취득
         var subsystems = new List<XRHandSubsystem>();
         SubsystemManager.GetSubsystems(subsystems);
         if (subsystems.Count > 0)
@@ -87,9 +91,10 @@ public class FingerDrivenGraspController : MonoBehaviour
 
     // ── XR Hand 업데이트 콜백 ─────────────────────────────────────
     private void OnHandsUpdated(XRHandSubsystem subsystem,
-                                XRHandSubsystem.UpdateSuccessFlags flags,
-                                XRHandSubsystem.UpdateType updateType)
+                                 XRHandSubsystem.UpdateSuccessFlags flags,
+                                 XRHandSubsystem.UpdateType updateType)
     {
+        // Physics 업데이트와 동기화
         if (updateType != XRHandSubsystem.UpdateType.Dynamic) return;
 
         XRHand hand = handedness == Handedness.Right
@@ -119,21 +124,18 @@ public class FingerDrivenGraspController : MonoBehaviour
     }
 
     // ── 손가락 이동 벡터 → GraspableObject 전달 ──────────────────
-    /// <summary>
-    /// [양손 수정] handGrasper.IsGrasping() 조건으로
-    /// 이 손이 실제로 파지 중인 오브젝트에만 displacement를 적용한다.
-    /// 반대 손이 잡은 오브젝트에는 절대 영향을 주지 않는다.
-    /// </summary>
     private void PropagateFingerDisplacement()
     {
+        // 현재 파지 중인 오브젝트가 없으면 스킵
+        // (handGrasper 내부 상태는 직접 접근 대신 이벤트로 받거나
+        //  여기서는 모든 GraspableObject를 씬에서 찾는 방식 사용)
         var graspables = FindObjectsByType<GraspableObject>(FindObjectsSortMode.None);
 
         foreach (var graspable in graspables)
         {
-            // ★ 변경: graspable.IsGrasped → handGrasper.IsGrasping(graspable)
-            // 씬 전체의 파지 오브젝트가 아니라, 이 손이 잡은 것만 처리
-            if (!handGrasper.IsGrasping(graspable)) continue;
+            if (!graspable.IsGrasped) continue;
 
+            // 각 뼈대의 이동 벡터 평균
             Vector3 avgDelta = Vector3.zero;
             int count = 0;
 
@@ -144,6 +146,7 @@ public class FingerDrivenGraspController : MonoBehaviour
                 Vector3 currentPos = mapping.boneCollider.WorldPosition;
                 if (prevBonePositions.TryGetValue(mapping.boneCollider, out Vector3 prev))
                 {
+                    // 이 뼈대가 오브젝트와 접촉 중인지 확인
                     if (IsContactingObject(mapping.boneCollider, graspable))
                     {
                         avgDelta += currentPos - prev;
@@ -156,12 +159,13 @@ public class FingerDrivenGraspController : MonoBehaviour
             if (count > 0)
             {
                 avgDelta /= count;
+                // 너무 큰 델타는 트래킹 점프로 판단해 무시
                 if (avgDelta.magnitude < 0.05f)
                     graspable.ApplyFingerDisplacement(avgDelta);
             }
         }
 
-        // 파지 중 오브젝트 없을 때도 이전 위치 갱신
+        // 파지 중인 오브젝트 없을 때도 이전 위치 갱신
         foreach (var mapping in boneMappings)
             if (mapping.boneCollider != null)
                 prevBonePositions[mapping.boneCollider] = mapping.boneCollider.WorldPosition;
@@ -169,9 +173,8 @@ public class FingerDrivenGraspController : MonoBehaviour
 
     // ── 분리 감지 및 강제 접촉 해제 ──────────────────────────────
     /// <summary>
-    /// [양손 수정] handGrasper.IsGrasping() 조건으로
-    /// 이 손이 파지 중인 오브젝트에 대해서만 분리를 감지한다.
-    /// 반대 손이 잡은 오브젝트의 분리를 이 손이 잘못 해제하는 일이 없다.
+    /// 뼈대가 오브젝트 표면에서 separationDistance 이상 멀어지면
+    /// OnCollisionExit이 발생하지 않은 경우에도 강제로 접촉 해제
     /// </summary>
     private void CheckAndForceSeparation()
     {
@@ -179,9 +182,6 @@ public class FingerDrivenGraspController : MonoBehaviour
 
         foreach (var graspable in graspables)
         {
-            // ★ 변경: 이 손이 잡고 있는 오브젝트만 분리 체크
-            if (!handGrasper.IsGrasping(graspable)) continue;
-
             Bounds objBounds = graspable.GetWorldBounds();
 
             foreach (var mapping in boneMappings)
@@ -192,15 +192,19 @@ public class FingerDrivenGraspController : MonoBehaviour
                 Vector3 closestPt = objBounds.ClosestPoint(bonePos);
                 float dist = Vector3.Distance(bonePos, closestPt);
 
+                // 충분히 멀어졌고, 아직 접촉 기록이 남아있으면 강제 해제
                 if (dist > separationDistance)
+                {
                     ForceRemoveContact(mapping.boneCollider, graspable);
+                }
             }
         }
     }
 
     private void ForceRemoveContact(FingerBoneCollider bone, GraspableObject obj)
     {
-        // 이 손의 handGrasper에만 Exit 통보 → 반대 손 파지에 영향 없음
+        // Reflection 대신 내부 메서드를 통해 해제
+        // FingerBoneCollider에서 직접 handGrasper에 통보
         handGrasper?.OnBoneContactExit(bone, obj);
     }
 
