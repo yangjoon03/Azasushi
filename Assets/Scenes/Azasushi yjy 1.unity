@@ -282,7 +282,7 @@ MonoBehaviour:
   handSide: 0
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1001 &9821838
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -906,7 +906,7 @@ MonoBehaviour:
   handSide: 1
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &42134093
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,7 +1165,7 @@ MonoBehaviour:
   handSide: 0
   fingerType: 1
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &59127644 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6212924289403535520, guid: d6878e1999eb4b44a9f5a263af86c185, type: 3}
@@ -1231,6 +1231,7 @@ MonoBehaviour:
   gravitySupportAngleThreshold: 60
   maxPenetrationDepth: 0
   innerGraspRatio: 0.01
+  spreadReleaseMargin: 0.015
   wristBone: {fileID: 0}
 --- !u!1 &89318626
 GameObject:
@@ -2112,10 +2113,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhysicalHandGrasper
   minContactBonesForGrasp: 2
-  minGraspForce: 0.15
+  minGraspForce: 0.1
   gravitySupportAngleThreshold: 60
   maxPenetrationDepth: 0
-  innerGraspRatio: 0.5
+  innerGraspRatio: 0.01
+  spreadReleaseMargin: 0.015
   wristBone: {fileID: 0}
 --- !u!114 &235275304
 MonoBehaviour:
@@ -2862,7 +2864,7 @@ MonoBehaviour:
   handSide: 0
   fingerType: 3
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &361856894
 GameObject:
   m_ObjectHideFlags: 0
@@ -6278,7 +6280,7 @@ MonoBehaviour:
   handSide: 1
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &852312762
 GameObject:
   m_ObjectHideFlags: 0
@@ -11685,7 +11687,7 @@ MonoBehaviour:
   handSide: 1
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!4 &1530035168 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5418636900650586692, guid: 89e80c47615e4f043926d66492d3ca5f, type: 3}
@@ -12399,7 +12401,7 @@ MonoBehaviour:
   handSide: 1
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &1633600914
 GameObject:
   m_ObjectHideFlags: 0
@@ -13657,7 +13659,7 @@ MonoBehaviour:
   handSide: 1
   fingerType: 0
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &1874101525
 GameObject:
   m_ObjectHideFlags: 0
@@ -13923,7 +13925,7 @@ MonoBehaviour:
   handSide: 0
   fingerType: 4
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &1887197405
 GameObject:
   m_ObjectHideFlags: 0
@@ -14806,7 +14808,7 @@ MonoBehaviour:
   handSide: 0
   fingerType: 2
   boneSegment: 0
-  minPenetrationDepth: 0.001
+  minPenetrationDepth: 0.01
 --- !u!1 &2011190208
 GameObject:
   m_ObjectHideFlags: 0
