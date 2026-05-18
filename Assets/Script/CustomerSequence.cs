@@ -8,47 +8,101 @@ public class CustomerSequence : MonoBehaviour
     public float walkTime = 3f;
     public float rotateSpeed = 180f;
 
+    public float orderTimeLimit = 30f;
+    public float respawnDelay = 1.5f;
+
+    public CustomerOrderManager orderManager;
+
+    private Vector3 startPosition;
+    private Quaternion startRotation;
     private Quaternion targetRotation;
+
+    private Renderer[] renderers;
+    private Collider[] colliders;
 
     void Start()
     {
         if (animator == null)
             animator = GetComponent<Animator>();
 
-        StartCoroutine(CustomerRoutine());
+        if (orderManager == null)
+            orderManager = FindObjectOfType<CustomerOrderManager>();
+
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+
+        renderers = GetComponentsInChildren<Renderer>();
+        colliders = GetComponentsInChildren<Collider>();
+
+        StartCoroutine(CustomerLoop());
     }
 
-    IEnumerator CustomerRoutine()
+    IEnumerator CustomerLoop()
     {
-        // 걷기 시작
-        animator.SetBool("isWalking", true);
-
-        float timer = 0f;
-
-        // 3초 동안 앞으로 이동
-        while (timer < walkTime)
+        while (true)
         {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-            timer += Time.deltaTime;
-            yield return null;
+            ShowCustomer(true);
+
+            transform.position = startPosition;
+            transform.rotation = startRotation;
+
+            orderManager.ClearOrder();
+
+            animator.SetBool("isWalking", true);
+
+            float timer = 0f;
+
+            while (timer < walkTime)
+            {
+                transform.position += transform.forward * moveSpeed * Time.deltaTime;
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            animator.SetBool("isWalking", false);
+
+            targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y - 90f, 0f);
+
+            while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+            {
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRotation,
+                    rotateSpeed * Time.deltaTime
+                );
+
+                yield return null;
+            }
+
+            transform.rotation = targetRotation;
+
+            orderManager.NewOrder();
+
+            float orderTimer = 0f;
+
+            while (orderTimer < orderTimeLimit)
+            {
+                if (!orderManager.hasActiveOrder)
+                    break;
+
+                orderTimer += Time.deltaTime;
+                yield return null;
+            }
+
+            orderManager.ClearOrder();
+
+            ShowCustomer(false);
+
+            yield return new WaitForSeconds(respawnDelay);
         }
+    }
 
-        // 걷기 종료
-        animator.SetBool("isWalking", false);
+    void ShowCustomer(bool show)
+    {
+        foreach (Renderer r in renderers)
+            r.enabled = show;
 
-        // 현재 방향 기준 왼쪽으로 90도 회전
-        targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y - 90f, 0f);
-
-        while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
-        {
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                rotateSpeed * Time.deltaTime
-            );
-            yield return null;
-        }
-
-        transform.rotation = targetRotation;
+        foreach (Collider c in colliders)
+            c.enabled = show;
     }
 }

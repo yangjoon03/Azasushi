@@ -9,9 +9,11 @@ public class CustomerOrderManager : MonoBehaviour
     public string currentOrder;
     private int score = 0;
 
+    public bool hasActiveOrder = false;
+
     void Start()
     {
-        NewOrder();
+        orderText.text = "";
         UpdateScore();
     }
 
@@ -20,25 +22,38 @@ public class CustomerOrderManager : MonoBehaviour
         string[] orders = { "saba", "unagi", "tai", "salmon", "shrimp", "otoro" };
 
         currentOrder = orders[Random.Range(0, orders.Length)];
+        hasActiveOrder = true;
 
         orderText.text = "Order: " + currentOrder;
     }
 
-    public void CheckSubmittedItem(string submittedItem)
+    public bool CheckSubmittedItem(string submittedItem)
     {
+        if (!hasActiveOrder)
+            return false;
+
         if (submittedItem == currentOrder)
         {
             score++;
-            orderText.text = "Correct! Submitted: " + submittedItem;
-
             UpdateScore();
 
-            Invoke(nameof(NewOrder), 1.5f);
+            orderText.text = "Correct!";
+            hasActiveOrder = false;
+
+            return true;
         }
         else
         {
             orderText.text = "Wrong! Order was: " + currentOrder;
+            return false;
         }
+    }
+
+    public void ClearOrder()
+    {
+        currentOrder = "";
+        hasActiveOrder = false;
+        orderText.text = "";
     }
 
     void UpdateScore()
