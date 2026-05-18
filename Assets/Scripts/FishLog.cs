@@ -7,21 +7,12 @@ public class FishLog : MonoBehaviour
 
     [Header("설정")]
     public float minCutSpeed = 0.3f;
-    public float sliceThickness = 0.03f;
+    public float sliceThickness = 0.1f;
     public int maxSlices = 10;
-    public Vector3 lengthAxis = Vector3.forward;
 
     private int sliceCount = 0;
-    private Vector3 fixedEndWorldPos;
     private bool isCutting = false;
     private Vector3 lastContactPoint;
-
-    void Start()
-    {
-        fixedEndWorldPos = transform.position
-            - transform.TransformDirection(lengthAxis)
-            * (transform.localScale.z / 2f);
-    }
 
     public void TryCut(Vector3 knifeVelocity, Vector3 contactPoint)
     {
@@ -39,57 +30,53 @@ public class FishLog : MonoBehaviour
     {
         sliceCount++;
 
+        // 슬라이스 생성
         if (sashimiSlicePrefab != null)
         {
-            // Y축으로 90도 회전 (원하는 각도로 숫자 바꿔도 돼)
-            Quaternion sliceRotation = transform.rotation * Quaternion.Euler(0f, 90f, 0f);
-
+            Quaternion sliceRotation =
+                transform.rotation * Quaternion.Euler(0f, 90f, 0f);
             GameObject slice = Instantiate(
                 sashimiSlicePrefab,
                 lastContactPoint,
                 sliceRotation
             );
-
-            Rigidbody rb = slice.GetComponent<Rigidbody>();
-            if (rb != null)
+            Rigidbody sliceRb = slice.GetComponent<Rigidbody>();
+            if (sliceRb != null)
             {
-                Vector3 popDir = transform.TransformDirection(lengthAxis) + Vector3.up * 0.5f;
-                rb.AddForce(popDir * 1.5f, ForceMode.Impulse);
+                Vector3 popDir = transform.forward + Vector3.up * 0.3f;
+                sliceRb.AddForce(popDir * 0.3f, ForceMode.Impulse);
             }
         }
 
-        ShrinkFishLog();
+        // 스케일 줄이기
+        Rigidbody rb = GetComponent<Rigidbody>();
+        Vector3 savedPos = transform.position;
+        bool wasKinematic = false;
 
+        if (rb != null)
+        {
+            wasKinematic = rb.isKinematic;
+            rb.isKinematic = true;
+        }
+
+        Vector3 newScale = transform.localScale;
+        newScale.z = Mathf.Max(newScale.z - sliceThickness, 0.01f);
+        transform.localScale = newScale;
+        transform.position = savedPos;
+
+        if (rb != null)
+        {
+            rb.isKinematic = wasKinematic;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // 다 잘렸으면 제거
         if (sliceCount >= maxSlices)
         {
-            Destroy(gameObject);
+            GraspableObject graspable = GetComponent<GraspableObject>();
+            if (graspable != null) graspable.enabled = false;
+            Destroy(gameObject, 0.1f);
         }
-    }
-
-    void ShrinkFishLog()
-    {
-        Vector3 newScale = transform.localScale;
-        newScale.z -= sliceThickness;
-        newScale.z = Mathf.Max(newScale.z, 0.01f);
-        transform.localScale = newScale;
-
-        Vector3 currentFixedEnd = transform.position
-            - transform.TransformDirection(lengthAxis) * (newScale.z / 2f);
-        transform.position += fixedEndWorldPos - currentFixedEnd;
-    }
-
-    Vector3 GetCutEndPosition()
-    {
-        return transform.position
-               + transform.TransformDirection(lengthAxis) * (transform.localScale.z / 2f);
-    }
-
-    void OnDrawGizmos()
-    {
-        if (!UnityEngine.Application.isPlaying) return;
-        Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(fixedEndWorldPos, 0.02f);
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(GetCutEndPosition(), 0.02f);
     }
 }

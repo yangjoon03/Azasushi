@@ -1663,6 +1663,7 @@ MonoBehaviour:
   gravitySupportAngleThreshold: 60
   maxPenetrationDepth: 0
   innerGraspRatio: 0.2
+  spreadReleaseMargin: 0.05
   wristBone: {fileID: 0}
 --- !u!1 &362292628
 GameObject:
@@ -7880,6 +7881,7 @@ MonoBehaviour:
   gravitySupportAngleThreshold: 60
   maxPenetrationDepth: 0
   innerGraspRatio: 0.5
+  spreadReleaseMargin: 0.05
   wristBone: {fileID: 0}
 --- !u!114 &1316850010
 MonoBehaviour:
@@ -10072,6 +10074,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 552653241}
     m_Modifications:
+    - target: {fileID: 5360070031952766414, guid: f0f826f38928e924f92107b69ba5836c, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4d0dc5aa6d898b543bf9e1910c95c089, type: 2}
     - target: {fileID: 5864310394141361179, guid: f0f826f38928e924f92107b69ba5836c, type: 3}
       propertyPath: m_Name
       value: riceAndSeaweed
