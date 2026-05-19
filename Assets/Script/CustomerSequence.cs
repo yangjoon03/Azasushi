@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class CustomerSequence : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class CustomerSequence : MonoBehaviour
     public float respawnDelay = 1.5f;
 
     public CustomerOrderManager orderManager;
+    public TextMeshPro customerNameText;
+
+    private static int customerNumber = 0;
 
     private Vector3 startPosition;
     private Quaternion startRotation;
@@ -45,6 +49,11 @@ public class CustomerSequence : MonoBehaviour
 
             transform.position = startPosition;
             transform.rotation = startRotation;
+
+            customerNumber++;
+
+            if (customerNameText != null)
+                customerNameText.text = "Customer" + customerNumber;
 
             orderManager.ClearOrder();
 
@@ -86,6 +95,10 @@ public class CustomerSequence : MonoBehaviour
                     break;
 
                 orderTimer += Time.deltaTime;
+
+                float timerRatio = orderTimer / orderTimeLimit;
+                orderManager.UpdateTimer(timerRatio);
+
                 yield return null;
             }
 

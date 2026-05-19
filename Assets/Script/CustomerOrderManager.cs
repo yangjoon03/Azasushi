@@ -1,10 +1,20 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class CustomerOrderManager : MonoBehaviour
 {
-    public TextMeshProUGUI orderText;
     public TextMeshProUGUI scoreText;
+
+    public Image sushiImage;       // 손님 머리 위 초밥 이미지
+    public Image timerFillImage;   // 빨갛게 차오르는 제한시간 이미지
+
+    public Sprite sabaSprite;
+    public Sprite unagiSprite;
+    public Sprite taiSprite;
+    public Sprite salmonSprite;
+    public Sprite shrimpSprite;
+    public Sprite otoroSprite;
 
     public string currentOrder;
     private int score = 0;
@@ -13,7 +23,7 @@ public class CustomerOrderManager : MonoBehaviour
 
     void Start()
     {
-        orderText.text = "";
+        ClearOrder();
         UpdateScore();
     }
 
@@ -24,7 +34,32 @@ public class CustomerOrderManager : MonoBehaviour
         currentOrder = orders[Random.Range(0, orders.Length)];
         hasActiveOrder = true;
 
-        orderText.text = "Order: " + currentOrder;
+        sushiImage.gameObject.SetActive(true);
+        timerFillImage.gameObject.SetActive(true);
+
+        timerFillImage.fillAmount = 0f;
+
+        switch (currentOrder)
+        {
+            case "saba":
+                sushiImage.sprite = sabaSprite;
+                break;
+            case "unagi":
+                sushiImage.sprite = unagiSprite;
+                break;
+            case "tai":
+                sushiImage.sprite = taiSprite;
+                break;
+            case "salmon":
+                sushiImage.sprite = salmonSprite;
+                break;
+            case "shrimp":
+                sushiImage.sprite = shrimpSprite;
+                break;
+            case "otoro":
+                sushiImage.sprite = otoroSprite;
+                break;
+        }
     }
 
     public bool CheckSubmittedItem(string submittedItem)
@@ -37,23 +72,32 @@ public class CustomerOrderManager : MonoBehaviour
             score++;
             UpdateScore();
 
-            orderText.text = "Correct!";
             hasActiveOrder = false;
-
             return true;
         }
-        else
-        {
-            orderText.text = "Wrong! Order was: " + currentOrder;
-            return false;
-        }
+
+        return false;
+    }
+
+    public void UpdateTimer(float value)
+    {
+        if (timerFillImage != null)
+            timerFillImage.fillAmount = value;
     }
 
     public void ClearOrder()
     {
         currentOrder = "";
         hasActiveOrder = false;
-        orderText.text = "";
+
+        if (sushiImage != null)
+            sushiImage.gameObject.SetActive(false);
+
+        if (timerFillImage != null)
+        {
+            timerFillImage.fillAmount = 0f;
+            timerFillImage.gameObject.SetActive(false);
+        }
     }
 
     void UpdateScore()
