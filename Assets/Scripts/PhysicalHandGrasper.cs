@@ -4,241 +4,238 @@ using System.Linq;
 
 /// <summary>
 /// 손 전체의 파지(Grasp) 로직을 담당한다.
-/// - 접촉 뼈대 수 집계
-/// - 중력 반대 방향 지지 여부 판단
-/// - 힘 강도(침투 깊이 기반) 계산
-/// - 파지 확정 / 해제 이벤트 발행
+///
+/// ── 파지 확정 조건 (모두 충족해야 함) ──────────────────────────
+///  1. 접촉 뼈대 수  >= minContactBonesForGrasp
+///  2. 서로 다른 손가락 수 >= minDistinctFingers   ← 한 손가락 달라붙기 차단
+///  3. 평균 침투 깊이 >= minPenetrationDepth        ← 근처 지나가기 차단 (핵심)
+///  4. 위에서만 누르는 접촉 비율 < topOnlyRatioLimit
 /// </summary>
 public class PhysicalHandGrasper : MonoBehaviour
 {
-    // ── 인스펙터 설정 ──────────────────────────────────────────────
+    // ── 인스펙터 ───────────────────────────────────────────────────
     [Header("Grasp Thresholds")]
-    [Tooltip("파지 확정에 필요한 최소 접촉 뼈대 수")]
-    public int minContactBonesForGrasp = 2;
+    [Tooltip("파지 확정에 필요한 최소 접촉 뼈대 수 (뼈대 마디 기준)")]
+    public int minContactBonesForGrasp = 3;
 
-    [Tooltip("파지 확정에 필요한 최소 힘 강도 (0~1)")]
-    public float minGraspForce = 0.15f;
+    [Tooltip("파지 확정에 필요한 최소 서로 다른 손가락 수 (한 손가락만 닿는 경우 차단)")]
+    public int minDistinctFingers = 2;
 
-    [Tooltip("중력 지지 판단 각도 허용 범위 (도) — 이 각도 이내면 '지지됨'으로 판정")]
+    [Tooltip("파지 확정에 필요한 뼈대당 최소 평균 침투 깊이 (m). 핵심 게이팅 값.\n" +
+             "너무 낮으면 스치기만 해도 파지됨. 권장: 0.003~0.006")]
+    public float minPenetrationDepth = 0.004f;
+
+    [Tooltip("중력 지지 판단 각도 허용 범위 (도)")]
     public float gravitySupportAngleThreshold = 60f;
 
-    [Header("Penetration → Force Mapping")]
-    [Tooltip("이 침투 깊이(m) 이상이면 최대 힘으로 판정")]
-    public float maxPenetrationDepth = 0.015f;
+    [Header("Release Thresholds")]
+    [Tooltip("파지 해제: 접촉 뼈대가 Bounds 표면에서 이 거리 이상 멀어지면 해제 (m)")]
+    public float releaseDistance = 0.03f;
 
-    [Header("Finger Spread Detection")]
-    [Tooltip("손가락이 오브젝트 크기보다 더 안쪽으로 들어온 비율 기준 (0~1)")]
-    public float innerGraspRatio = 0.5f;
-
-    [Tooltip("접촉 중인 뼈대 기준 평균 거리가 objRadius + 이 값 이상이면 파지 해제 (m)")]
-    public float spreadReleaseMargin = 0.05f;
+    [Header("Grasp Direction")]
+    [Tooltip("위에서만 누르는 접촉 비율이 이 값 이상이면 파지 무효 (0~1)")]
+    [Range(0.5f, 1.0f)]
+    public float topOnlyRatioLimit = 0.80f;
 
     [Header("Hand Root Bone")]
     public Transform wristBone;
 
+    [Header("Debug")]
+    [Tooltip("활성화 시 파지 평가 상세 로그 출력 (Console에서 확인)")]
+    public bool debugLog = true;
+
     // ── 내부 상태 ──────────────────────────────────────────────────
-    // 오브젝트별로 접촉 중인 뼈대 집합과 각 뼈대의 접촉 데이터 저장
     private Dictionary<GraspableObject, ObjectContactState> contactStates
         = new Dictionary<GraspableObject, ObjectContactState>();
 
-    // 현재 파지 확정된 오브젝트
     private Dictionary<GraspableObject, GraspState> activeGrasps
         = new Dictionary<GraspableObject, GraspState>();
 
-    // ── 데이터 구조체 ──────────────────────────────────────────────
+    // ── 데이터 구조 ────────────────────────────────────────────────
     private class ObjectContactState
     {
-        // 뼈대 → 접촉 데이터
         public Dictionary<FingerBoneCollider, FingerBoneCollider.BoneContactData> boneContacts
             = new Dictionary<FingerBoneCollider, FingerBoneCollider.BoneContactData>();
 
         public int ContactCount => boneContacts.Count;
+
+        /// <summary>서로 다른 손가락(FingerType) 수</summary>
+        public int DistinctFingerCount()
+        {
+            var fingers = new HashSet<FingerType>();
+            foreach (var b in boneContacts.Keys)
+                fingers.Add(b.fingerType);
+            return fingers.Count;
+        }
+
+        /// <summary>접촉 중인 뼈대들의 평균 침투 깊이</summary>
+        public float AveragePenetrationDepth()
+        {
+            if (boneContacts.Count == 0) return 0f;
+            float sum = 0f;
+            foreach (var d in boneContacts.Values)
+                sum += d.penetrationDepth;
+            return sum / boneContacts.Count;
+        }
     }
 
     public class GraspState
     {
         public GraspableObject target;
-        public Vector3 graspAnchorLocal;       // 파지 시작 시점 오브젝트 로컬 앵커 (손 기준)
-        public Quaternion graspRotationOffset; // 파지 시작 시점 회전 오프셋
-        public float graspForce;               // 0~1
-        public bool isGravitySupported;        // 중력 반대 접촉 존재 여부
-        public Vector3 graspCenter;            // 월드 좌표 파지 중심점
+        public Vector3 graspAnchorLocal;
+        public Quaternion graspRotationOffset;
+        public float graspForce;
+        public bool isGravitySupported;
+        public Vector3 graspCenter;
     }
 
     // ── Unity 생명주기 ─────────────────────────────────────────────
     private void FixedUpdate()
     {
-        // 매 물리 프레임마다 파지 조건 재평가
         EvaluateAllGrasps();
     }
 
-    // ── 뼈대에서 호출되는 콜백 ────────────────────────────────────
+    // ── 뼈대 콜백 ─────────────────────────────────────────────────
     public void OnBoneContactEnter(FingerBoneCollider bone,
+                                    GraspableObject obj,
+                                    FingerBoneCollider.BoneContactData data)
+    {
+        EnsureContactState(obj).boneContacts[bone] = data;
+    }
+
+    public void OnBoneContactStay(FingerBoneCollider bone,
                                    GraspableObject obj,
                                    FingerBoneCollider.BoneContactData data)
     {
         EnsureContactState(obj).boneContacts[bone] = data;
     }
 
-    public void OnBoneContactStay(FingerBoneCollider bone,
-                                  GraspableObject obj,
-                                  FingerBoneCollider.BoneContactData data)
-    {
-        EnsureContactState(obj).boneContacts[bone] = data;
-    }
-
     public void OnBoneContactExit(FingerBoneCollider bone, GraspableObject obj)
     {
-        // 파지 확정 중인 오브젝트는 OnCollisionExit 무시
-        // (isKinematic 전환 시 Unity가 강제로 Exit를 발생시키기 때문)
+        // 파지 확정 중에는 isKinematic 전환으로 인한 가짜 Exit 무시
         if (activeGrasps.ContainsKey(obj)) return;
 
         if (!contactStates.TryGetValue(obj, out var state)) return;
         state.boneContacts.Remove(bone);
 
         if (state.ContactCount == 0)
-        {
             contactStates.Remove(obj);
-            TryReleaseGrasp(obj);
-        }
     }
 
-    // ── 파지 평가 ──────────────────────────────────────────────────
+    // ── 파지 평가 메인 ────────────────────────────────────────────
     private void EvaluateAllGrasps()
     {
+        // 1. 새로운 파지 확정 시도
         foreach (var kvp in contactStates)
             EvaluateGraspForObject(kvp.Key, kvp.Value);
 
-        // 파지 해제: contactStates 없음 OR 접촉 뼈대 기준으로 충분히 펼쳐짐
+        // 2. 기존 파지 해제 판정
         var toRelease = activeGrasps.Keys
-            .Where(o => !contactStates.ContainsKey(o) || IsFingerSpreadEnoughToRelease(o))
+            .Where(ShouldRelease)
             .ToList();
 
-        foreach (var o in toRelease) TryReleaseGrasp(o);
-    }
-
-    /// <summary>
-    /// 파지 중 접촉 뼈대들이 오브젝트에서 충분히 멀어지면 true → 파지 해제.
-    /// allBones 전체가 아닌 현재 contactStates에 등록된 뼈대만 기준으로 삼아
-    /// 안 닿은 손가락이 평균을 왜곡하는 문제를 방지한다.
-    /// </summary>
-    private bool IsFingerSpreadEnoughToRelease(GraspableObject obj)
-    {
-        if (!activeGrasps.ContainsKey(obj)) return false;
-
-        // contactStates에 없으면 접촉 뼈대가 0개 → 해제
-        if (!contactStates.TryGetValue(obj, out var state)) return true;
-
-        Bounds bounds = obj.GetWorldBounds();
-        float objRadius = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
-
-        Vector3 objCenter = obj.transform.position;
-        float totalDist = 0f;
-        int count = 0;
-
-        // ★ 핵심 수정: allBones 전체 → 실제 접촉 중인 뼈대만
-        foreach (var bone in state.boneContacts.Keys)
-        {
-            totalDist += Vector3.Distance(bone.WorldPosition, objCenter);
-            count++;
-        }
-
-        if (count == 0) return true;
-
-        float avgDist = totalDist / count;
-        return avgDist > objRadius + spreadReleaseMargin;
+        foreach (var o in toRelease)
+            TryReleaseGrasp(o);
     }
 
     private void EvaluateGraspForObject(GraspableObject obj, ObjectContactState state)
     {
         bool isAlreadyGrasped = activeGrasps.ContainsKey(obj);
 
-        // 1. 접촉 뼈대 수 조건
+        // ── 조건 1: 접촉 뼈대 수 ──────────────────────────────────
         if (state.ContactCount < minContactBonesForGrasp)
         {
+            if (debugLog && state.ContactCount > 0)
+                Debug.Log($"[Grasp] {obj.name} — ❌ 뼈대 수 부족 {state.ContactCount}/{minContactBonesForGrasp}");
             if (isAlreadyGrasped) TryReleaseGrasp(obj);
             return;
         }
 
-        // 2. 힘 강도 계산
-        float force = CalculateGraspForce(obj, state);
-        if (force < minGraspForce)
+        // ── 조건 2: 서로 다른 손가락 수 ──────────────────────────
+        int distinctFingers = state.DistinctFingerCount();
+        if (distinctFingers < minDistinctFingers)
         {
+            if (debugLog)
+                Debug.Log($"[Grasp] {obj.name} — ❌ 손가락 수 부족 {distinctFingers}/{minDistinctFingers}");
             if (isAlreadyGrasped) TryReleaseGrasp(obj);
             return;
         }
 
-        // 3. 중력 지지 방향 검사
+        // ── 조건 3: 평균 침투 깊이 ────────────────────────────────
+        float avgDepth = state.AveragePenetrationDepth();
+        if (avgDepth < minPenetrationDepth)
+        {
+            if (debugLog)
+                Debug.Log($"[Grasp] {obj.name} — ❌ 침투 깊이 부족 " +
+                          $"{avgDepth * 1000:F2}mm / 필요 {minPenetrationDepth * 1000:F2}mm");
+            if (isAlreadyGrasped) TryReleaseGrasp(obj);
+            return;
+        }
+
+        // ── 조건 4: 파지 방향 ──────────────────────────────────────
+        if (!IsGraspDirectionValid(state))
+        {
+            if (debugLog)
+                Debug.Log($"[Grasp] {obj.name} — ❌ 방향 무효 (위에서만 누름)");
+            if (isAlreadyGrasped) TryReleaseGrasp(obj);
+            return;
+        }
+
+        // ── 파지 확정 ─────────────────────────────────────────────
+        float force = Mathf.Clamp01(avgDepth / 0.015f);
         bool gravitySupported = CheckGravitySupport(state);
 
-        // 4. 파지 방향 유효성 검사 (위에서 누르는 경우 차단)
-        if (!IsGraspDirectionValid(obj, state))
-        {
-            if (isAlreadyGrasped) TryReleaseGrasp(obj);
-            return;
-        }
-
-        // ── 파지 확정 ──
         if (!isAlreadyGrasped)
-        {
             InitiateGrasp(obj, state, force, gravitySupported);
-        }
         else
         {
-            // 기존 파지 상태 갱신
             var gs = activeGrasps[obj];
             gs.graspForce = force;
             gs.isGravitySupported = gravitySupported;
         }
     }
 
-    // ── 힘 계산: 손가락이 오브젝트 내부로 얼마나 들어왔나 ─────────
-    private float CalculateGraspForce(GraspableObject obj, ObjectContactState state)
+    // ── 파지 해제 판정 ────────────────────────────────────────────
+    /// <summary>
+    /// 접촉 뼈대의 50% 이상이 Bounds 표면에서 releaseDistance 이상 멀어지면 해제.
+    /// isKinematic 전환으로 contactStates가 비워지지 않으므로 거리 기반으로 판정.
+    /// </summary>
+    private bool ShouldRelease(GraspableObject obj)
     {
-        float totalForce = 0f;
-        Bounds objBounds = obj.GetWorldBounds();
+        if (!contactStates.TryGetValue(obj, out var state)) return true;
+        if (state.ContactCount == 0) return true;
+
+        Bounds bounds = obj.GetWorldBounds();
+        int farCount = 0;
+
+        foreach (var bone in state.boneContacts.Keys)
+        {
+            Vector3 closest = bounds.ClosestPoint(bone.WorldPosition);
+            if (Vector3.Distance(bone.WorldPosition, closest) > releaseDistance)
+                farCount++;
+        }
+
+        return farCount >= Mathf.CeilToInt(state.ContactCount * 0.5f);
+    }
+
+    // ── 파지 방향 유효성 ─────────────────────────────────────────
+    private bool IsGraspDirectionValid(ObjectContactState state)
+    {
+        Vector3 gravityDir = Physics.gravity.normalized;
+        int topOnlyContacts = 0;
 
         foreach (var kvp in state.boneContacts)
         {
-            var bone = kvp.Key;
-            var data = kvp.Value;
-
-            // 기본 힘: 침투 깊이 비례
-            float depthForce = Mathf.Clamp01(data.penetrationDepth / maxPenetrationDepth);
-
-            // 보너스 힘: 뼈대가 오브젝트 중심을 얼마나 가로질렀나
-            float innerBonus = CalculateInnerPenetrationBonus(bone.WorldPosition, obj, objBounds);
-
-            totalForce += depthForce + innerBonus * 0.5f;
+            float angle = Vector3.Angle(gravityDir, kvp.Value.contactNormal);
+            if (angle < gravitySupportAngleThreshold)
+                topOnlyContacts++;
         }
 
-        // 평균화 후 0~1 클램프
-        return Mathf.Clamp01(totalForce / Mathf.Max(1, state.ContactCount));
+        float topRatio = (float)topOnlyContacts / state.ContactCount;
+        return topRatio < topOnlyRatioLimit;
     }
 
-    /// <summary>
-    /// 뼈대 위치가 오브젝트 크기의 중심 절반 영역 안에 있으면 보너스
-    /// (손을 오브젝트 크기보다 안쪽으로 넣었을 때 강한 힘 판정)
-    /// </summary>
-    private float CalculateInnerPenetrationBonus(Vector3 boneWorld,
-                                                  GraspableObject obj,
-                                                  Bounds bounds)
-    {
-        Vector3 localPos = obj.transform.InverseTransformPoint(boneWorld);
-        Vector3 halfSize = bounds.extents * innerGraspRatio;
-
-        float dx = Mathf.Clamp01(1f - Mathf.Abs(localPos.x) / halfSize.x);
-        float dy = Mathf.Clamp01(1f - Mathf.Abs(localPos.y) / halfSize.y);
-        float dz = Mathf.Clamp01(1f - Mathf.Abs(localPos.z) / halfSize.z);
-
-        return (dx + dy + dz) / 3f;
-    }
-
-    // ── 중력 지지 판단 ─────────────────────────────────────────────
-    /// <summary>
-    /// 접촉 법선들 중 중력(아래→위 = Vector3.up)과 충분히 반대되는 것이 있으면 true.
-    /// 즉, 아래에서 받쳐주는 접촉이 존재하면 오브젝트가 떨어지지 않는다.
-    /// </summary>
+    // ── 중력 지지 판단 ────────────────────────────────────────────
     private bool CheckGravitySupport(ObjectContactState state)
     {
         Vector3 gravityDir = Physics.gravity.normalized;
@@ -252,40 +249,15 @@ public class PhysicalHandGrasper : MonoBehaviour
         return false;
     }
 
-    // ── 파지 방향 유효성 (위에서 누르기 차단) ─────────────────────
-    /// <summary>
-    /// 모든 접촉 법선이 "중력 방향"(아래쪽)에 가깝다면 위에서만 누르는 상황.
-    /// 이 경우 파지 무효. 반대로 옆면 또는 아래에서의 접촉이 포함되면 유효.
-    /// </summary>
-    private bool IsGraspDirectionValid(GraspableObject obj, ObjectContactState state)
-    {
-        Vector3 gravityDir = Physics.gravity.normalized;
-        int topOnlyContacts = 0;
-
-        foreach (var kvp in state.boneContacts)
-        {
-            Vector3 normal = kvp.Value.contactNormal;
-            float angle = Vector3.Angle(gravityDir, normal);
-            if (angle < gravitySupportAngleThreshold)
-                topOnlyContacts++;
-        }
-
-        // 위에서만 누르는 접촉이 전체의 80% 이상이면 무효
-        float topRatio = (float)topOnlyContacts / state.ContactCount;
-        return topRatio < 0.8f;
-    }
-
-    // ── 파지 시작 / 해제 ───────────────────────────────────────────
+    // ── 파지 시작 ─────────────────────────────────────────────────
     private void InitiateGrasp(GraspableObject obj, ObjectContactState state,
                                 float force, bool gravitySupported)
     {
-        // 파지 중심점: 모든 접촉점의 평균
         Vector3 graspCenter = Vector3.zero;
         foreach (var kvp in state.boneContacts)
             graspCenter += kvp.Value.contactPoint;
         graspCenter /= state.ContactCount;
 
-        // 파지 앵커: wristBone 기준 로컬 좌표로 저장
         Transform anchor = wristBone != null ? wristBone : transform;
         Vector3 localAnchor = anchor.InverseTransformPoint(obj.transform.position);
         Quaternion rotOffset = Quaternion.Inverse(anchor.rotation) * obj.transform.rotation;
@@ -303,7 +275,9 @@ public class PhysicalHandGrasper : MonoBehaviour
         activeGrasps[obj] = graspState;
         obj.OnGrasped(graspState, this);
 
-        Debug.Log($"[Grasp] {obj.name} 파지 확정 — 접촉 뼈대:{state.ContactCount}, " +
+        Debug.Log($"[Grasp] ✅ {obj.name} 파지 확정 — " +
+                  $"뼈대:{state.ContactCount}, 손가락:{state.DistinctFingerCount()}, " +
+                  $"깊이:{state.AveragePenetrationDepth() * 1000:F2}mm, " +
                   $"힘:{force:F2}, 중력지지:{gravitySupported}");
     }
 
@@ -312,7 +286,7 @@ public class PhysicalHandGrasper : MonoBehaviour
         if (!activeGrasps.TryGetValue(obj, out var gs)) return;
         activeGrasps.Remove(obj);
         obj.OnReleased(gs);
-        Debug.Log($"[Grasp] {obj.name} 파지 해제");
+        Debug.Log($"[Grasp] ❌ {obj.name} 파지 해제");
     }
 
     // ── 외부 접근자 ───────────────────────────────────────────────
