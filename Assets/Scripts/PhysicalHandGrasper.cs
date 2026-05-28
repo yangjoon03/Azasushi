@@ -288,7 +288,7 @@ public class PhysicalHandGrasper : MonoBehaviour
         obj.OnReleased(gs);
         Debug.Log($"[Grasp] ❌ {obj.name} 파지 해제");
     }
-
+    
     // ── 외부 접근자 ───────────────────────────────────────────────
     public bool IsGrasping(GraspableObject obj) => activeGrasps.ContainsKey(obj);
 
