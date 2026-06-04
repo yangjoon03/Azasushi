@@ -13,17 +13,35 @@ public class RiceBowl : MonoBehaviour
     public Vector3 riceBallScale = new Vector3(0.05f, 0.05f, 0.05f);
 
     private GameObject currentRiceBall;
-    private bool isSushiAttached = false; // 초밥 덩어리가 손에 있는지
+    private bool isSushiAttached = false;
 
     void OnTriggerEnter(Collider other)
     {
-        // 밥 덩어리 또는 초밥 덩어리가 손에 있으면 생성 금지
         if (currentRiceBall != null) return;
         if (isSushiAttached) return;
 
         if (other.GetComponent<FingerBoneCollider>() != null)
         {
-            bool isRightHand = other.transform.root.name == "Right Hand";
+            // 부모 계층에서 Right/Left Hand 찾기
+            bool isRightHand = false;
+            Transform current = other.transform;
+            while (current != null)
+            {
+                if (current.name == "Right Hand")
+                {
+                    isRightHand = true;
+                    break;
+                }
+                if (current.name == "Left Hand")
+                {
+                    isRightHand = false;
+                    break;
+                }
+                current = current.parent;
+            }
+
+            UnityEngine.Debug.Log("오른손 여부: " + isRightHand);
+
             Transform attachPoint = isRightHand
                 ? rightHandAttachPoint
                 : leftHandAttachPoint;
@@ -66,16 +84,14 @@ public class RiceBowl : MonoBehaviour
         UnityEngine.Debug.Log("rice2 부착 완료!");
     }
 
-    // rice2 → rice3 변환 시 호출
     public void OnRiceBallComplete()
     {
         currentRiceBall = null;
-        isSushiAttached = true; // 초밥 덩어리 손에 붙음
+        isSushiAttached = true;
     }
 
-    // rice3 손에서 분리 시 호출
     public void OnSushiDetached()
     {
-        isSushiAttached = false; // 다시 생성 가능
+        isSushiAttached = false;
     }
 }
