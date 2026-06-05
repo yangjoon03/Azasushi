@@ -6,8 +6,8 @@ public class RiceBowl : MonoBehaviour
     public GameObject riceBallPrefab;
 
     [Header("¼Õ ºÎÂø À§Ä¡")]
-    public Transform rightHandAttachPoint;
     public Transform leftHandAttachPoint;
+    public Transform rightHandAttachPoint;
 
     [Header("¹ä µ¢¾î¸® Å©±â")]
     public Vector3 riceBallScale = new Vector3(0.05f, 0.05f, 0.05f);
