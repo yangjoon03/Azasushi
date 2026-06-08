@@ -6,29 +6,63 @@ public class SubmitZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        string submittedItem = other.gameObject.name.ToLower();
+        TrySubmit(other);
+    }
 
-        // (Clone) 제거
-        submittedItem = submittedItem.Replace("(clone)", "").Trim();
-
-        // 정확히 일치하는 경우만 인정
-        if (IsValidSushi(submittedItem))
+    void TrySubmit(Collider other)
+    {
+        if (orderManager == null)
         {
-            orderManager.CheckSubmittedItem(submittedItem);
+            Debug.LogWarning("Order Manager가 연결되지 않았습니다.");
+            return;
         }
-        else
+
+        GameObject sushiObject = FindWholeSushiObject(other.transform);
+
+        if (sushiObject == null)
         {
-            Debug.Log("Not a completed sushi: " + submittedItem);
+            Debug.Log("완성 초밥 아님: " + other.name);
+            return;
+        }
+
+        string submittedTag = sushiObject.tag;
+
+        bool correct = orderManager.CheckSubmittedTag(submittedTag);
+
+        Debug.Log("제출 초밥: " + sushiObject.name + " / Tag: " + submittedTag + " / Correct: " + correct);
+
+        if (correct)
+        {
+            Debug.Log("정답 초밥 전체 삭제: " + sushiObject.name);
+
+            sushiObject.SetActive(false);
+            Destroy(sushiObject);
         }
     }
 
-    bool IsValidSushi(string name)
+    GameObject FindWholeSushiObject(Transform start)
     {
-        return name == "saba" ||
-               name == "unagi" ||
-               name == "tai" ||
-               name == "salmon" ||
-               name == "shrimp" ||
-               name == "otoro";
+        Transform current = start;
+        GameObject foundSushi = null;
+
+        while (current != null)
+        {
+            if (IsSushiTag(current.tag))
+            {
+                foundSushi = current.gameObject;
+            }
+
+            current = current.parent;
+        }
+
+        return foundSushi;
+    }
+
+    bool IsSushiTag(string tag)
+    {
+        return tag == "saba" ||
+               tag == "tai" ||
+               tag == "salmon" ||
+               tag == "otoro";
     }
 }

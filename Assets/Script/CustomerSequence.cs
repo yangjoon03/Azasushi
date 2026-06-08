@@ -1,37 +1,24 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
 
 public class CustomerSequence : MonoBehaviour
 {
-    public Animator animator;
+    public CustomerOrderManager orderManager;
+
     public float moveSpeed = 1.5f;
     public float walkTime = 3f;
     public float rotateSpeed = 180f;
-
     public float orderTimeLimit = 30f;
     public float respawnDelay = 1.5f;
 
-    public CustomerOrderManager orderManager;
-    public TextMeshPro customerNameText;
-
-    private static int customerNumber = 0;
-
     private Vector3 startPosition;
     private Quaternion startRotation;
-    private Quaternion targetRotation;
 
     private Renderer[] renderers;
     private Collider[] colliders;
 
     void Start()
     {
-        if (animator == null)
-            animator = GetComponent<Animator>();
-
-        if (orderManager == null)
-            orderManager = FindObjectOfType<CustomerOrderManager>();
-
         startPosition = transform.position;
         startRotation = transform.rotation;
 
@@ -45,45 +32,60 @@ public class CustomerSequence : MonoBehaviour
     {
         while (true)
         {
+            if (orderManager.IsCleared())
+                yield break;
+
             ShowCustomer(true);
 
             transform.position = startPosition;
             transform.rotation = startRotation;
 
-            customerNumber++;
-
-            if (customerNameText != null)
-                customerNameText.text = "Customer" + customerNumber;
-
             orderManager.ClearOrder();
-
-            animator.SetBool("isWalking", true);
 
             float timer = 0f;
 
             while (timer < walkTime)
             {
-                transform.position += transform.forward * moveSpeed * Time.deltaTime;
+                if (orderManager.IsCleared())
+                    yield break;
+
+                transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
                 timer += Time.deltaTime;
                 yield return null;
             }
 
-            animator.SetBool("isWalking", false);
 
-            targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y - 90f, 0f);
 
-            while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+
+
+            // 정확히 왼쪽 90도 회전
+
+            Quaternion rotateStartRotation = transform.rotation;
+            Quaternion rotateTargetRotation = rotateStartRotation * Quaternion.Euler(0f, -90f, 0f);
+
+            float rotateTime = 0f;
+            float rotateDuration = 0.5f;
+
+            while (rotateTime < rotateDuration)
             {
-                transform.rotation = Quaternion.RotateTowards(
-                    transform.rotation,
-                    targetRotation,
-                    rotateSpeed * Time.deltaTime
+                if (orderManager.IsCleared())
+                    yield break;
+
+                rotateTime += Time.deltaTime;
+
+                transform.rotation = Quaternion.Slerp(
+                    rotateStartRotation,
+                    rotateTargetRotation,
+                    rotateTime / rotateDuration
                 );
 
                 yield return null;
             }
 
-            transform.rotation = targetRotation;
+            transform.rotation = rotateTargetRotation;
+
+            if (orderManager.IsCleared())
+                yield break;
 
             orderManager.NewOrder();
 
@@ -91,16 +93,20 @@ public class CustomerSequence : MonoBehaviour
 
             while (orderTimer < orderTimeLimit)
             {
+                if (orderManager.IsCleared())
+                    yield break;
+
                 if (!orderManager.hasActiveOrder)
                     break;
 
                 orderTimer += Time.deltaTime;
-
-                float timerRatio = orderTimer / orderTimeLimit;
-                orderManager.UpdateTimer(timerRatio);
+                orderManager.UpdateTimer(orderTimer / orderTimeLimit);
 
                 yield return null;
             }
+
+            if (orderManager.IsCleared())
+                yield break;
 
             orderManager.ClearOrder();
 
